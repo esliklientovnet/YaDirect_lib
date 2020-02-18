@@ -1,22 +1,34 @@
+import sys
 import json
 from io import StringIO
 from time import sleep
-
 import pandas as pd
 import requests
 from requests.exceptions import ConnectionError
 
-from settings import *
+if sys.version_info < (3,):
+    def u(x):
+        try:
+            return x.encode("utf8")
+        except UnicodeDecodeError:
+            return x
+else:
+    def u(x):
+        if type(x) == type(b''):
+            return x.decode('utf8')
+        else:
+            return x
 
 
 
 
 class yaDirect():
     """Class for Yandex Direct API"""
+    
 
     def __init__(self, token, login, apiVersion=5):
         self.login = login
-        self._token = settings.token
+        self._token = token
         self.apiVersion = apiVersion
         # self.yaDirectUrl = url = "https://api-sandbox.direct.yandex.com/json/v%s/" % self.apiVersion
         self.yaDirectUrl = url = "https://api.direct.yandex.com/json/v%s/" % self.apiVersion
@@ -57,11 +69,11 @@ class yaDirect():
             try:
                 req = requests.post(url, jdata, headers=headers)
                 # Отладочная информация
-                # print("Стутус: {}".format(req.status_code))
+                # print("Статус: {}".format(req.status_code))
                 # print("Заголовки запроса: {}".format(req.request.headers))
-                # print("Запрос: {}".format(u(req.request.body)))
+                # print("Запрос: {}".format(req.request.body))
                 # print("Заголовки ответа: {}".format(req.headers))
-                # print("Ответ: {}".format(u(req.text)))
+                # print("Ответ: {}".format(req.text))
                 # print("\n")
                 # Обработка запроса
                 if 'LimitedBy' in req.text:
@@ -143,7 +155,7 @@ class yaDirect():
         method = "get"
         params = {
             "SelectionCriteria": {},
-            "FieldNames": ["ClientId", "ClientInfo", "Login"]
+            "FieldNames": ["ClientId", "ClientInfo", "Login", "Archived]
         }
         result = self.requestAPI(service, method, params)
         clients = result.json()
